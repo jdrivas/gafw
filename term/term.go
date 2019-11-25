@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/jdrivas/gcli/config"
 	"github.com/spf13/viper"
 )
+
+const ScreenProfileKey = "screenProfile"
+const ScreenDarkValue = "dark"
 
 // Use this with github.com/juju/ansi term to get a TabWriter that works with color.
 type ColorSprintfFunc func(string, ...interface{}) string
@@ -26,11 +28,11 @@ var (
 	Alert     = color.New(color.FgRed).SprintfFunc()
 )
 
-var screen = config.ScreenDarkValue
+var screen = ScreenDarkValue
 
 func InitTerm() {
-	screen = viper.GetString(config.ScreenProfileKey)
-	if screen == config.ScreenDarkValue {
+	screen = viper.GetString(ScreenProfileKey)
+	if screen == ScreenDarkValue {
 		fmt.Printf("Doing light collors.\n")
 		// Text Formatting
 		Title = color.New(color.FgHiWhite).SprintfFunc()

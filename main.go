@@ -3,21 +3,19 @@
 package main
 
 import (
-	"github.com/jdrivas/gcli/cmd"
-	"github.com/jdrivas/gcli/config"
-	"github.com/jdrivas/gcli/term"
+	"github.com/jdrivas/gafw/cmd"
 )
 
 func main() {
 
-	config.InitConfig()
-	cmd.InitCmd()
+	// config.InitConfig()
+	cmd.InitCmd() // Set up the initial commands.
 	// fmt.Printf("Configuration:\n")
 	// for k, v := range viper.AllSettings() {
 	// 	fmt.Printf("%s: %v\n", k, v)
 	// }
 
-	term.InitTerm()
+	// term.InitTerm()
 
 	// Off you go ....
 	cmd.Execute()

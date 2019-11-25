@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
-	"github.com/jdrivas/gcli/config"
-	t "github.com/jdrivas/gcli/term"
+	"github.com/jdrivas/gafw/config"
+	t "github.com/jdrivas/gafw/term"
 
 	// "github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -67,6 +67,7 @@ var (
 // Each time through the loop we rebuild the command tree
 //  and reinitialize the flags.
 func resetEnvironment() {
+	fmt.Printf("%s\n", t.Title("interactive.restEnvironment"))
 
 	// Start fresh and rebuid the rootCommand tree.
 	rootCmd.ResetCommands()
@@ -77,10 +78,13 @@ func resetEnvironment() {
 
 	// initialize the flags on the tree
 	initFlags()
+	config.InitConfig()
 	// This is only here to reset the prmopt
 	// TODO: The connection handling logicis is
 	// a disaster. Fix it.
 	initConnectionWithFlags()
+	fmt.Printf("%s\n", t.Title("interactive.restEnvironment - exit"))
+
 }
 
 // Parse the line and execute the command
@@ -99,16 +103,18 @@ func promptLoop(process func(string) error) (err error) {
 	resetEnvironment()
 
 	for moreCommands := true; moreCommands; {
-		conn := getCurrentConnection()
-		serviceURL := conn.ServiceURL
-		connName := conn.Name
-		token := conn.getSafeToken(true, false)
-		spacer := ""
-		if token != "" {
-			spacer = " "
-		}
+		// conn := getCurrentConnection()
+		// serviceURL := conn.ServiceURL
+		// connName := conn.Name
+		// token := conn.getSafeToken(true, false)
+		// spacer := ""
+		// if token != "" {
+		// 	spacer = " "
+		// }
 		status := statusDisplay()
-		prompt := fmt.Sprintf("%s [%s%s %s]: ", t.Title(config.AppName), t.Info(status), t.Highlight(connName), t.SubTitle("%s%s%s", serviceURL, spacer, token))
+		// prompt := fmt.Sprintf("%s [%s%s %s]: ", t.Title(config.AppName), t.Info(status), t.Highlight(connName), t.SubTitle("%s%s%s", serviceURL, spacer, token))
+		prompt := fmt.Sprintf("%s [%s%s]: ", t.Title(config.AppName), t.Info(status), t.SubTitle("context"))
+
 		line, err := readline.Line(prompt)
 		if err == io.EOF {
 			moreCommands = false
@@ -128,10 +134,10 @@ func promptLoop(process func(string) error) (err error) {
 // Yes, I'm sure there's some kind of []rune
 // thing to do here instead.
 func statusDisplay() (s string) {
-	if Verbose() {
+	if config.Verbose() {
 		s = fmt.Sprintf("%s%s", s, "v")
 	}
-	if Debug() {
+	if config.Debug() {
 		s = fmt.Sprintf("%s%s", s, "d")
 	}
 	if len(s) > 0 {
