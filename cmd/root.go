@@ -9,6 +9,7 @@ import (
 	"github.com/jdrivas/gafw/config"
 	"github.com/jdrivas/gafw/term"
 	t "github.com/jdrivas/gafw/term"
+	"github.com/jdrivas/gafw/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -70,7 +71,7 @@ func buildRoot(mode runMode) {
 		Short: "Print version.",
 		Long:  "Every program needs a version, this shows you what the value is.",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Version: %g\n", 0.1)
+			fmt.Printf("%s\n", version.Version)
 		},
 	})
 
