@@ -67,23 +67,31 @@ var (
 // Each time through the loop we rebuild the command tree
 //  and reinitialize the flags.
 func resetEnvironment() {
-	fmt.Printf("%s\n", t.Title("interactive.restEnvironment"))
+	if config.Debug() {
+		fmt.Printf("%s\n", t.Title("interactive.resetEnvironment()"))
+	}
 
-	// Start fresh and rebuid the rootCommand tree.
+	// We must rebuild the flags and the command
+	// each time through.
+	// Remember
+	rootCmd.ResetFlags()
 	rootCmd.ResetCommands()
 	buildRoot(interactive)
+	initFlags()
 	rootCmd.AddCommand(exitCmd)
 	rootCmd.AddCommand(verboseCmd)
 	rootCmd.AddCommand(debugCmd)
 
 	// initialize the flags on the tree
-	initFlags()
-	config.InitConfig()
+	// initFlags()
+	// config.InitConfig()
 	// This is only here to reset the prmopt
 	// TODO: The connection handling logicis is
 	// a disaster. Fix it.
-	initConnectionWithFlags()
-	fmt.Printf("%s\n", t.Title("interactive.restEnvironment - exit"))
+	// initConnectionWithFlags()
+	if config.Debug() {
+		fmt.Printf("%s\n", t.Title("interactive.resetEnvironment() - exit"))
+	}
 
 }
 

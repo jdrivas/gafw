@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	t "github.com/jdrivas/gafw/term"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
@@ -27,9 +26,11 @@ var (
 
 // YAML Variables which show up in viper, but managed here.
 const (
-	DebugKey         = "debug"            // bool
-	VerboseKey       = "verbose"          // bool
-	ScreenProfileKey = t.ScreenProfileKey // this avoids the circular reference to
+	DebugKey   = "debug"   // bool
+	VerboseKey = "verbose" // bool
+	// ScreenProfileKey = t.ScreenProfileKey // this avoids the circular reference to
+	ScreenProfileKey = "screenProfile" // string
+	ScreenDarkValue  = "dark"
 )
 
 // Flags These are the long form flag values for command line flags.
@@ -47,7 +48,7 @@ const (
 // InitConfig reads in config file and ENV variables if set.
 func InitConfig() {
 
-	fmt.Printf("%s\n", t.Title("InitConfig"))
+	// fmt.Printf("%s\n", t.Title("InitConfig")) // Can't bracket with util.Debug as Debug uses config.
 
 	// Fin a config file
 	if ConfigFileName != "" {
@@ -77,7 +78,7 @@ func InitConfig() {
 	} else {
 		fmt.Printf("Error loading config file: %s - %v\n", viper.ConfigFileUsed(), err)
 	}
-	fmt.Printf("%s\n", t.SubTitle("Debug is: %t", viper.GetBool(DebugKey)))
-	fmt.Printf("%s\n", t.Title("InitConfig - exit"))
+
+	// fmt.Printf("%s\n", t.Title("InitConfig - exit"))
 
 }

@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/jdrivas/gafw/config"
 	"github.com/spf13/viper"
 )
 
-const ScreenProfileKey = "screenProfile"
-const ScreenDarkValue = "dark"
+// const ScreenProfileKey = "screenProfile"
+// const ScreenDarkValue = "dark"
 
 // Use this with github.com/juju/ansi term to get a TabWriter that works with color.
 type ColorSprintfFunc func(string, ...interface{}) string
@@ -28,12 +29,15 @@ var (
 	Alert     = color.New(color.FgRed).SprintfFunc()
 )
 
-var screen = ScreenDarkValue
+var screen = config.ScreenDarkValue
 
 func InitTerm() {
-	screen = viper.GetString(ScreenProfileKey)
-	if screen == ScreenDarkValue {
-		fmt.Printf("Doing light collors.\n")
+	if config.Debug() {
+		fmt.Printf("Initing Term.\n")
+	}
+	screen = viper.GetString(config.ScreenProfileKey)
+	if screen == config.ScreenDarkValue {
+		fmt.Printf("Doing Dark collors.\n")
 		// Text Formatting
 		Title = color.New(color.FgHiWhite).SprintfFunc()
 		SubTitle = color.New(color.FgWhite).SprintfFunc()
@@ -48,7 +52,10 @@ func InitTerm() {
 		Alert = color.New(color.FgRed).SprintfFunc()
 
 	}
-	// fmt.Printf("%s %s %s\n", Title("Title"), SubTitle("SubTitle"), Highlight("Highlight"))
+
+	if config.Debug() {
+		fmt.Printf("%s %s %s %s\n", Title("Title"), SubTitle("SubTitle"), Text("Text"), Highlight("Highlight"))
+	}
 }
 
 func Error(err error) string {

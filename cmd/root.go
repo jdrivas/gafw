@@ -7,10 +7,12 @@ import (
 	"os"
 
 	"github.com/jdrivas/gafw/config"
+	"github.com/jdrivas/gafw/term"
 	t "github.com/jdrivas/gafw/term"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
-	// "github.com/spf13/pflag"
+	"github.com/juju/ansiterm"
 	"github.com/spf13/viper"
 )
 
@@ -49,13 +51,69 @@ func buildRoot(mode runMode) {
 		Short: "Interactive mode",
 		Long:  "Runs a command line interpreter with sematnics to make session use easy.",
 		Run: func(cmd *cobra.Command, args []string) {
+			if config.Debug() {
+				fmt.Printf("Processing interactive.\n")
+			}
 			DoInteractive()
+			if config.Debug() {
+				fmt.Printf("interactive done.\n")
+			}
 		},
 	}
 	// Add the commands to the rootCmd node (e.g. http get /users).
 	if mode != interactive {
 		rootCmd.AddCommand(interactiveCmd)
 	}
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "version",
+		Short: "Print version.",
+		Long:  "Every program needs a version, this shows you what the value is.",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("Version: %g\n", 0.1)
+		},
+	})
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "flags",
+		Short: "view flags",
+		Long:  "Display the flags for this appliation and their current settings.",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("%s\n", t.SubTitle("Flags are:"))
+			fs := rootCmd.PersistentFlags()
+			w := ansiterm.NewTabWriter(os.Stdout, 4, 4, 2, ' ', 0)
+			fmt.Fprintf(w, "%s", t.Title("Name\tShort\tValue\tDefValue\tChanged\n"))
+			fs.VisitAll(func(f *pflag.Flag) {
+				fmt.Fprintf(w, "%s\n", t.SubTitle("%s\t%s\t%s\t%s\t%t",
+					f.Name, f.Shorthand, f.Value.String(), f.DefValue, f.Changed))
+			})
+			w.Flush()
+			if viper.GetBool(config.DebugFlagKey) {
+				fmt.Printf("viper Debug key is set.\n")
+			}
+
+		},
+	})
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "config",
+		Short: "view configuration",
+		Long:  "Display the configuration information for this application as set by file, evnironment, flags",
+		Run: func(cmd *cobra.Command, args []string) {
+			settings := viper.AllSettings()
+			fmt.Printf("%s\n", t.SubTitle("Settings are:"))
+			w := ansiterm.NewTabWriter(os.Stdout, 4, 4, 2, ' ', 0)
+			fmt.Fprintf(w, "%s", t.Title("Name\tValue\n"))
+			for k := range settings {
+				fmt.Fprintf(w, "%s\t%s\n", t.Title("%s", k), t.SubTitle("%#+v", settings[k]))
+			}
+			w.Flush()
+			if viper.GetBool(config.DebugFlagKey) {
+				fmt.Printf("viper Debug key is set.\n")
+			}
+
+		},
+	})
 
 	// httpCmd = &cobra.Command{
 	// 	Use:   "http",
@@ -71,45 +129,50 @@ func buildRoot(mode runMode) {
 // Flag and config file init.
 //
 
-var (
-	// tokenFV, hubURLFV                                  string
-	// authClientIDFV, authClientSecretFV, authRedirectFV string
-
-	verbose, debug bool
-)
-
 // InitCmd is designed to be used from Main - ordering is important here so can't just execute whenever.
 // Should only be called once.
-func InitCmd() {
-	fmt.Printf("%s\n", t.Title("InitCmd"))
+func init() {
+	// fmt.Printf("%s\n", t.Title("InitCmd"))  // We can't bracket this with config.Debug as viper won't be set yet.
 
-	// Root is created here, rather than in build root to deal with command line
-	// flags in interactive mode.
-	// Any root command flags set on the original command line should persist
-	// to _each_ interactive command. They can  be explicitly overridden if needed.
+	cobra.OnInitialize(doCobraOnInit)
+
 	rootCmd = &cobra.Command{
 		Use:   fmt.Sprintf("%s <command> [<args>]", config.AppName),
 		Short: "Talk to a forest server.",
 		Long:  "A tool for working with a forest server.",
 	}
 
-	// We initFlags here because rootCmd.Execute() will parse the command line
-	// and error out if flags are present that are not defined.
+	// Wants to happen ahead of cobra initialization.
+	// Flags are parsed before the cobra.OnInitialization call.
 	initFlags()
-	config.InitConfig()
-	fmt.Printf("%s\n", t.SubTitle("Debug is: %t", viper.GetBool(config.DebugKey)))
 
-	// Each time we run a command we should do cobraInit()
-	// cobra.OnInitialize(cobraInit)
-	fmt.Printf("%s\n", t.Title("InitCmd - exit"))
+	// fmt.Printf("%s\n", t.Title("InitCmd - exit"))
 
 }
 
-func initFlags() {
-	fmt.Printf("%s\n", t.Title("initFlags"))
+func doCobraOnInit() {
+	// yes, yes we could do real tracing ....
+	if config.Debug() {
+		fmt.Printf("%s\n", t.Title("doCobraOnInit()"))
+	}
+	config.InitConfig()
+	term.InitTerm()
 
-	// Rest flags to start
-	rootCmd.ResetFlags()
+	if config.Debug() {
+		fmt.Printf("%s\n", t.Title("doCobraOnInit() - exit"))
+	}
+}
+
+var (
+	debug, verbose bool
+)
+
+// This is pulled out of the general init because
+// we want to refer to it in interactive mode, where we first rootCmd.ResetFlags() to start
+// from scratch and then call this to reset the flags.
+// This allows a one time set of the flags from the interactive command line.
+func initFlags() {
+	// fmt.Printf("%s\n", t.Title("initFlags"))
 
 	// Flags available to everyone.
 	rootCmd.PersistentFlags().StringVar(&config.ConfigFileName, config.ConfigFlagKey, "", fmt.Sprintf("config file location. (default is %s{yaml,json,toml}", config.ConfigFileRoot))
@@ -120,34 +183,5 @@ func initFlags() {
 	rootCmd.PersistentFlags().BoolVarP(&debug, config.DebugFlagKey, "d", false, "Describe details about what's happening.")
 	viper.BindPFlag(config.DebugFlagKey, rootCmd.PersistentFlags().Lookup(config.DebugFlagKey))
 
-	fmt.Printf("%s\n", t.SubTitle("Debug is: %t", viper.GetBool(config.DebugKey)))
-
-	// fmt.Printf("%s\n", t.Title("End of InitFlags - Viper dump"))
-	// viper.Debug()
-	// fmt.Printf("%s\n", t.Title("End of InitFlags - End of Viper dump"))
-
-}
-
-// This should be called AFTER the config file has been read.
-func initConnectionWithFlags() {
-	fmt.Printf("%s\n", t.Title("InitConnectionWithFlags"))
-
-	// Do the normal config file default
-	// initConnections()
-
-}
-
-// Intended to be executed once before each commend.
-// This happens after the commands line has been parsed
-// but before any CMDs have been executed.
-func cobraInit() {
-	fmt.Printf("%s\n", t.Title("cobraInit"))
-	fmt.Printf("%s\n", t.SubTitle("Debug is: %t", viper.GetBool(config.DebugKey)))
-
-	// config.InitConfig()
-	initFlags()
-	initConnectionWithFlags()
-	config.InitConfig()
-	fmt.Printf("%s\n", t.Title("cobraInit - exit"))
-
+	// fmt.Printf("%s\n", t.Title("initFlags -- done"))
 }
