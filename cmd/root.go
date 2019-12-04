@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/jdrivas/gafw/config"
+	"github.com/jdrivas/gafw/connection"
 	"github.com/jdrivas/gafw/term"
 	t "github.com/jdrivas/gafw/term"
 	"github.com/jdrivas/gafw/version"
@@ -116,14 +117,13 @@ func buildRoot(mode runMode) {
 		},
 	})
 
-	// httpCmd = &cobra.Command{
-	// 	Use:   "http",
-	// 	Short: "Use HTTP verbs.",
-	// 	Long:  "Send requests to the service with HTTP verbs and arguments.",
-	// }
-	// rootCmd.AddCommand(httpCmd)
-
-	// buildHTTP(mode)
+	httpCmd = &cobra.Command{
+		Use:   "http",
+		Short: "Use HTTP verbs.",
+		Long:  "Send requests to the service with HTTP verbs and arguments.",
+	}
+	rootCmd.AddCommand(httpCmd)
+	buildHTTP(mode)
 }
 
 //
@@ -158,6 +158,7 @@ func doCobraOnInit() {
 	}
 	config.InitConfig()
 	term.InitTerm()
+	connection.InitConnections()
 
 	if config.Debug() {
 		fmt.Printf("%s\n", t.Title("doCobraOnInit() - exit"))

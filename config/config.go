@@ -26,23 +26,28 @@ var (
 
 // YAML Variables which show up in viper, but managed here.
 const (
-	DebugKey   = "debug"   // bool
-	VerboseKey = "verbose" // bool
-	// ScreenProfileKey = t.ScreenProfileKey // this avoids the circular reference to
+	DebugKey         = "debug"         // bool
+	VerboseKey       = "verbose"       // bool
 	ScreenProfileKey = "screenProfile" // string
 	ScreenDarkValue  = "dark"
 )
 
 // Flags These are the long form flag values for command line flags.
 const (
-	ConfigFlagKey       = "config"
-	hubURLFlagKey       = "hub-url"
-	TokenFlagKey        = "token"
-	AuthRedirectFlagKey = "auth-redirect-url"
-	ClientIDFlagKey     = "client-id"
-	ClientSecretFlagKey = "client-secret"
-	VerboseFlagKey      = "verbose"
-	DebugFlagKey        = "debug"
+	ConfigFlagKey  = "config"
+	VerboseFlagKey = "verbose"
+	DebugFlagKey   = "debug"
+)
+
+//
+// Connections
+const (
+	ConnectionsKey             = "connections"       // string
+	DefaultConnectionNameKey   = "defaultConnection" // string
+	DefaultConnectionNameValue = "default"           // value is a string
+	ServiceURLKey              = "serviceURL"        // string
+	AuthTokenKey               = "authToken"         //string
+	HeadersKey                 = "headers"           // map[string]string
 )
 
 // InitConfig reads in config file and ENV variables if set.

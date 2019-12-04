@@ -58,6 +58,7 @@ func InitTerm() {
 	}
 }
 
+// Error formats an error string.
 func Error(err error) string {
-	return (fmt.Sprintf("%s %s", Title("Error: "), Fail("%v", err)))
+	return (fmt.Sprintf("%s %s", Title("Error: "), Fail("%v", err.Error())))
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/chzyer/readline"
 	"github.com/jdrivas/gafw/config"
+	"github.com/jdrivas/gafw/connection"
 	t "github.com/jdrivas/gafw/term"
 
 	// "github.com/fatih/color"
@@ -111,17 +112,18 @@ func promptLoop(process func(string) error) (err error) {
 	resetEnvironment()
 
 	for moreCommands := true; moreCommands; {
-		// conn := getCurrentConnection()
-		// serviceURL := conn.ServiceURL
-		// connName := conn.Name
+		conn := connection.GetCurrentConnection()
+		serviceURL := conn.ServiceURL
+		connName := conn.Name
 		// token := conn.getSafeToken(true, false)
-		// spacer := ""
-		// if token != "" {
-		// 	spacer = " "
-		// }
+		token := ""
+		spacer := ""
+		if token != "" {
+			spacer = " "
+		}
 		status := statusDisplay()
-		// prompt := fmt.Sprintf("%s [%s%s %s]: ", t.Title(config.AppName), t.Info(status), t.Highlight(connName), t.SubTitle("%s%s%s", serviceURL, spacer, token))
-		prompt := fmt.Sprintf("%s [%s%s]: ", t.Title(config.AppName), t.Info(status), t.SubTitle("context"))
+		prompt := fmt.Sprintf("%s [%s%s %s]: ", t.Title(config.AppName), t.Info(status), t.Highlight(connName), t.SubTitle("%s%s%s", serviceURL, spacer, token))
+		// prompt := fmt.Sprintf("%s [%s%s]: ", t.Title(config.AppName), t.Info(status), t.SubTitle("context"))
 
 		line, err := readline.Line(prompt)
 		if err == io.EOF {
