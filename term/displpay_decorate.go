@@ -257,10 +257,10 @@ func prettyPrintBody(body []byte) {
 		// Print out the pretty body
 		fmt.Printf("%s\n%s\n", Title("RESP JSON Body:"), Text("%s", string(prettyJSON.Bytes())))
 	} else {
-		// Much of the time, we've just ready past the body in properly handling the response.
+		// Much of the time, we've just read past the body in properly handling the response.
 		if len(body) > 0 {
-			fmt.Printf("%s\n%s\n", Title("RESP Body:"), Text("%s", string(body)))
-			fmt.Printf("%s %s \n", Title("JSON Error:"), Fail("%v", err))
+			fmt.Printf("%s %s \n", Title("JSON indenting error:"), Fail("%v", err))
+			fmt.Printf("%s\n%s\n", Title("So here is the RESP body:"), Text("%s", string(body)))
 		}
 	}
 

@@ -99,7 +99,7 @@ func resetEnvironment() {
 // Parse the line and execute the command
 func doICommand(line string) (err error) {
 
-	rootCmd.SetArgs(strings.Split(line, " "))
+	rootCmd.SetArgs(strings.Fields(line)) // Don't use strings.Split - it won't eat white space.
 	err = rootCmd.Execute()
 
 	resetEnvironment()

@@ -17,8 +17,8 @@ func buildHTTP(node runMode) {
 		Use:                   "send [flags] <method> <command> [<json-string> ....]",
 		DisableFlagsInUseLine: true,
 		Aliases:               []string{"SEND"},
-		Short:                 "HTTP <method> <command> to hub.",
-		Long: `Sends an HTTP <method> <command> to the Jupyterhub hub.
+		Short:                 "HTTP <method> <command> to the service.",
+		Long: `Sends an HTTP <method> <command> to the current service endpoint.
 <method> is an HTTP verb (e.g. "GET")
 
 All of the args following <command> are caputred as a single json 
@@ -39,9 +39,9 @@ with the ContentType header set to application/json.`,
 		Use:                   "get [flags]  <command>",
 		Aliases:               []string{"GET"},
 		DisableFlagsInUseLine: true,
-		Short:                 "HTTP GET <arg> to hub.",
+		Short:                 "HTTP GET <arg> to service.",
 		Args:                  cobra.MinimumNArgs(1),
-		Long:                  " Sends an HTTP GET <arg> to the Jupyterhub hub.",
+		Long:                  " Sends an HTTP GET <arg> to the service endpoint.",
 		Example:               fmt.Sprintf("%s http get /users", config.AppName),
 		Run: func(cmd *cobra.Command, args []string) {
 			term.HTTPDisplay(connection.GetCurrentConnection().Get(args[0], nil))
@@ -52,8 +52,8 @@ with the ContentType header set to application/json.`,
 		Use:                   "post [flags] <command> [<json-string> ....]",
 		Aliases:               []string{"POST"},
 		DisableFlagsInUseLine: true,
-		Short:                 "HTTP POST <command> to hub.",
-		Long: `Sends an HTTP POST <command> to the Hub.  
+		Short:                 "HTTP POST <command> to setrvice.",
+		Long: `Sends an HTTP POST <command> to the service endpoint.  
 
 All of the args follwing <command> are caputred as a single json 
 string and placed in the body of the request, 
@@ -72,8 +72,8 @@ with the ContentType header set to application/json.`,
 	httpCmd.AddCommand(&cobra.Command{
 		Use:     "delete [flags] <command> [<json-string> ....]",
 		Aliases: []string{"DELETE"},
-		Short:   "HTTP DELETE <arg> to hub.",
-		Long: `Sends an HTTP DELETE <command> to the Hub.  
+		Short:   "HTTP DELETE <arg> to service.",
+		Long: `Sends an HTTP DELETE <command> to the service endpoint.  
 
 All of the args following <command> are caputred as a single json 
 string and placed in the body of the request, 

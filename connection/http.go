@@ -124,16 +124,14 @@ func sendReq(req *http.Request, result interface{}) (resp *http.Response, err er
 	return resp, err
 }
 
-// newRequest creates a request as usual prepending the connections ServiceURL to the cmd,
-// and adding the Authorization header using token.
+// newRequest creates a request as usual prepending the connections ServiceURL to the cmd.
 func (conn Connection) newRequest(method, cmd string, body io.Reader) *http.Request {
-	// req, err := conn.jhReq(method, cmd, body)
+	// fmt.Printf("Generating request for connection: %#+v\n", conn)
 	req, err := http.NewRequest(method, conn.ServiceURL+cmd, body)
 	if err != nil {
 		panic(fmt.Sprintf("Coulnd't generate HTTP request - %s\n", err.Error()))
 	}
 
-	// req.Header.Add("Authorization", fmt.Sprintf("token %s", conn.Token))
 	for k, v := range conn.Headers {
 		req.Header.Add(k, v)
 	}
