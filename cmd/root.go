@@ -42,7 +42,7 @@ func Execute() {
 var (
 	rootCmd, interactiveCmd *cobra.Command
 	httpCmd                 *cobra.Command
-	listCmd                 *cobra.Command
+	listCmd, setCmd         *cobra.Command
 )
 
 // This is pulled out specially, because for interactive
@@ -125,13 +125,23 @@ func buildRoot(mode runMode) {
 	}
 	rootCmd.AddCommand(listCmd)
 
+	setCmd = &cobra.Command{
+		Use:   "set",
+		Short: "Set a value",
+		Long:  "Set a value or values to the application state or on an object.",
+	}
+	rootCmd.AddCommand(setCmd)
+
 	httpCmd = &cobra.Command{
 		Use:   "http",
 		Short: "Use HTTP verbs.",
 		Long:  "Send requests to the service with HTTP verbs and arguments.",
 	}
 	rootCmd.AddCommand(httpCmd)
+
+	// Build out sub menus.
 	buildHTTP(mode)
+	buildConnection(mode)
 
 }
 

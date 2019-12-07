@@ -3,6 +3,7 @@ package connection
 import (
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/jdrivas/gafw/config"
 	"github.com/jdrivas/gafw/term"
@@ -26,16 +27,35 @@ type Connection struct {
 // ConnectionList is a colleciton of connections.
 type ConnectionList []*Connection
 
-var currentConnection *Connection
+// Sort by name
+type byName ConnectionList
+
+func (a byName) Len() int           { return len(a) }
+func (a byName) Swap(i, j int)      { a[j], a[i] = a[i], a[j] }
+func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+// Manage a stack of connections
+var currentConnections = make([]*Connection, 0)
 
 // GetCurrentConnection is the primary interface for getting the connection to use.
 func GetCurrentConnection() *Connection {
-	return currentConnection
+	if len(currentConnections) == 0 {
+		return nil
+	}
+	// Get the top of the stack
+	return currentConnections[len(currentConnections)-1]
 }
 
-// SetCurrentConnection sets the connection in use.
-func SetCurrentConnection(conn *Connection) {
-	currentConnection = conn
+// PushCurrentConnection  adds the connection to the stack, setting the new current connection.
+func PushCurrentConnection(conn *Connection) {
+	currentConnections = append(currentConnections, conn)
+}
+
+// PopCurrentConnection returns the top of the stack and sets the new
+// current connection to the next topmost stack item.
+func PopCurrentConnection() (c *Connection) {
+	currentConnections, c = currentConnections[:len(currentConnections)-1], currentConnections[len(currentConnections)-1]
+	return c
 }
 
 // GetAllConnections returns a list of known connections
@@ -52,7 +72,7 @@ func GetConnection(name string) (*Connection, bool) {
 func SetConnection(name string) (err error) {
 	conn, ok := GetConnection(name)
 	if ok {
-		SetCurrentConnection(conn)
+		PushCurrentConnection(conn)
 	} else {
 		err = fmt.Errorf("couldn't find connection \"%s\"", name)
 	}
@@ -61,18 +81,18 @@ func SetConnection(name string) (err error) {
 
 // List displpays the list of connections and notes the current one.
 func (conns ConnectionList) List() {
+	sort.Sort(byName(conns))
 	if len(conns) > 0 {
-		// currentName := getCurrentConnection().Name
+		currentName := GetCurrentConnection().Name
 		w := ansiterm.NewTabWriter(os.Stdout, 4, 4, 3, ' ', 0)
-		// fmt.Fprintf(w, "%s\n", t.Title("\tName\tURL\tToken"))
 		fmt.Fprintf(w, "%s\n", t.Title("\tName\tURL"))
 		for _, c := range conns {
 			name := term.Text(c.Name)
 			current := ""
-			// if c.Name == currentName {
-			// 	name = term.Highlight("%s", c.Name)
-			// 	current = term.Highlight("%s", "*")
-			// }
+			if c.Name == currentName {
+				name = term.Highlight("%s", c.Name)
+				current = term.Highlight("%s", "*")
+			}
 			fmt.Fprintf(w, "%s\t%s\t%s\n", current, name, t.Text("%s", c.ServiceURL))
 		}
 		w.Flush()
@@ -96,13 +116,6 @@ func getAllConnectionsFromConfig() (conns ConnectionList) {
 	return conns
 }
 
-// Get a connection from the config file:
-// connections:
-//    name:
-//        serviceURL: https://foo.bar.com
-//        authToken: XXXX-YYYYY-XXXXX
-//        Headers:
-//            X-User-Id: 1234557-1237AC
 func getConnectionFromConfig(name string) (conn *Connection, ok bool) {
 	connKey := fmt.Sprintf("%s.%s", config.ConnectionsKey, name)
 	if viper.IsSet(connKey) {
@@ -115,7 +128,6 @@ func getConnectionFromConfig(name string) (conn *Connection, ok bool) {
 		ok = true
 	}
 	return conn, ok
-
 }
 
 // initConnections sets up the first current Connection,
@@ -124,6 +136,7 @@ func getConnectionFromConfig(name string) (conn *Connection, ok bool) {
 const defaultServiceURL = "http://127.0.0.1:80"
 
 // InitConnections initializes a default connection. Needs to happen after we've read in the viper configuration file.
+// TODO: It's probably best if init is idempotent.
 func InitConnections() {
 	if config.Debug() {
 		fmt.Printf("Initializing Connections\n")
@@ -132,7 +145,7 @@ func InitConnections() {
 	// Current conenction should be durable during interactive mode
 	// reset it to the default ...
 	var conn *Connection
-	if currentConnection == nil {
+	if len(currentConnections) == 0 {
 		if config.Debug() {
 			fmt.Printf("No current Connection.\n")
 		}
@@ -144,27 +157,65 @@ func InitConnections() {
 			defaultName := viper.GetString(config.DefaultConnectionNameKey)
 			conn, ok = GetConnection(defaultName)
 			if !ok {
-				if config.Debug() {
-					fmt.Printf("Using a 'broken' default connection.\n")
+
+				// .. next try to see if there are _any_ defined connections
+				// Rather than pick a random (maps don't have a determined order.
+				// and we get connections as a map).
+				// We'll pick the first lexographic one.
+				var connNames []string
+				for c := range viper.GetStringMap(config.ConnectionsKey) {
+					connNames = append(connNames, c)
 				}
-				// ... As a last resort set up a broken empty connection.
-				// We won't panic here as we can set it during interactive
-				// mode and it will otherwise error.
-				conn = &Connection{
-					Name:       config.DefaultConnectionNameValue,
-					ServiceURL: defaultServiceURL,
+				if len(connNames) > 0 {
+					sort.Strings(connNames)
+					conn, _ = GetConnection(connNames[0]) // We're not checking ok, as we got the list from viper.
+				} else {
+					// ... As a last resort set up a broken empty connection.
+					// We won't panic here as we can set it during interactive
+					// mode and it will otherwise error.
+					if config.Debug() {
+						fmt.Printf("Using a 'broken' default connection.\n")
+					}
+					conn = &Connection{
+						Name:       config.DefaultConnectionNameValue,
+						ServiceURL: defaultServiceURL,
+					}
 				}
 			}
 		}
 		if config.Debug() {
 			fmt.Printf("Using connection: %s[%s]\n", conn.Name, conn.ServiceURL)
 		}
-		// lastConnection = conn
-		SetCurrentConnection(conn)
+		PushCurrentConnection(conn)
 	}
-	// 	// or if we've just changed it for one command, reset it to previous.
-	// } else if getCurrentConnection().Name == updatedConnectionName {
-	// 	conn = lastConnection
-	// 	SetCurrentConnection(conn)
-	// }
+}
+
+// Get an initial connection from viper or
+func initialConnection() (conn *Connection) {
+
+	var ok bool
+	conn, ok = GetConnection(config.DefaultConnectionNameValue)
+	if !ok {
+		// .. Otherwise, see if there is a _name_ of a defined connection to use as default ...
+		defaultName := viper.GetString(config.DefaultConnectionNameKey)
+		conn, ok = GetConnection(defaultName)
+		if !ok {
+			if config.Debug() {
+				fmt.Printf("Using a 'broken' default connection.\n")
+			}
+			// ... As a last resort set up a broken empty connection.
+			// We won't panic here as we can set it during interactive
+			// mode and it will otherwise error.
+			conn = &Connection{
+				Name:       config.DefaultConnectionNameValue,
+				ServiceURL: defaultServiceURL,
+			}
+		}
+	}
+
+	if config.Debug() {
+		fmt.Printf("Using connection: %s[%s]\n", conn.Name, conn.ServiceURL)
+	}
+	return conn
+
 }

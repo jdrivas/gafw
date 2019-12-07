@@ -140,7 +140,7 @@ func render(renderer func(), resp *http.Response, err error) {
 // Thus httpDecorate(errorDecorate(d.List)) will first print
 // the http Response, then the error message, then the List().
 
-// HTTPDisplay - This is for the HTTP direct commands which have jh ojects.
+// HTTPDisplay - This is for the HTTP direct commands.
 func HTTPDisplay(resp *http.Response, err error) {
 	httpDecorate(errorDecorate(func() {}, err), resp)()
 }

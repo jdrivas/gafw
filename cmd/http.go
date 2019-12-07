@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func buildHTTP(node runMode) {
+func buildHTTP(mode runMode) {
 	// HTTP Util
 	// TODO: Consider validating the HTTP verbs.
 	httpCmd.AddCommand(&cobra.Command{
@@ -39,9 +39,9 @@ with the ContentType header set to application/json.`,
 		Use:                   "get [flags]  <command>",
 		Aliases:               []string{"GET"},
 		DisableFlagsInUseLine: true,
-		Short:                 "HTTP GET <arg> to service.",
+		Short:                 "HTTP GET <command> to service.",
 		Args:                  cobra.MinimumNArgs(1),
-		Long:                  " Sends an HTTP GET <arg> to the service endpoint.",
+		Long:                  " Sends an HTTP GET <command> to the service endpoint.",
 		Example:               fmt.Sprintf("%s http get /users", config.AppName),
 		Run: func(cmd *cobra.Command, args []string) {
 			term.HTTPDisplay(connection.GetCurrentConnection().Get(args[0], nil))
@@ -52,8 +52,8 @@ with the ContentType header set to application/json.`,
 		Use:                   "post [flags] <command> [<json-string> ....]",
 		Aliases:               []string{"POST"},
 		DisableFlagsInUseLine: true,
-		Short:                 "HTTP POST <command> to setrvice.",
-		Long: `Sends an HTTP POST <command> to the service endpoint.  
+		Short:                 "HTTP POST <command> <body> to service.",
+		Long: `Sends an HTTP POST <command> <body> to the service endpoint.  
 
 All of the args follwing <command> are caputred as a single json 
 string and placed in the body of the request, 
@@ -72,8 +72,8 @@ with the ContentType header set to application/json.`,
 	httpCmd.AddCommand(&cobra.Command{
 		Use:     "delete [flags] <command> [<json-string> ....]",
 		Aliases: []string{"DELETE"},
-		Short:   "HTTP DELETE <arg> to service.",
-		Long: `Sends an HTTP DELETE <command> to the service endpoint.  
+		Short:   "HTTP DELETE <command> <body> to service.",
+		Long: `Sends an HTTP DELETE <command> <body>to the service endpoint.  
 
 All of the args following <command> are caputred as a single json 
 string and placed in the body of the request, 
@@ -85,6 +85,7 @@ with the ContentType header set to application/json.`,
 		},
 	})
 
+	//
 	// Conection Management
 	listCmd.AddCommand(&cobra.Command{
 		Use:   "connections [flags]",
