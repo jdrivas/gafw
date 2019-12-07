@@ -84,4 +84,16 @@ with the ContentType header set to application/json.`,
 			term.HTTPDisplay(connection.GetCurrentConnection().Delete(args[0], nil, nil))
 		},
 	})
+
+	// Conection Management
+	listCmd.AddCommand(&cobra.Command{
+		Use:   "connections [flags]",
+		Short: "list connections available for service",
+		Long:  "Display a description of the connections available to sue to send HTTP commands.",
+		Args:  cobra.MaximumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			conns := connection.GetAllConnections()
+			term.List(conns, nil, nil)
+		},
+	})
 }

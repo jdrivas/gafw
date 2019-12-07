@@ -2,11 +2,18 @@ package connection
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/jdrivas/gafw/config"
 	"github.com/jdrivas/gafw/term"
+	t "github.com/jdrivas/gafw/term"
+	"github.com/juju/ansiterm"
 	"github.com/spf13/viper"
 )
+
+//
+// Public API
+//
 
 // Connection contains information for connecting to a service endpoint.
 type Connection struct {
@@ -52,6 +59,29 @@ func SetConnection(name string) (err error) {
 	return err
 }
 
+// List displpays the list of connections and notes the current one.
+func (conns ConnectionList) List() {
+	if len(conns) > 0 {
+		// currentName := getCurrentConnection().Name
+		w := ansiterm.NewTabWriter(os.Stdout, 4, 4, 3, ' ', 0)
+		// fmt.Fprintf(w, "%s\n", t.Title("\tName\tURL\tToken"))
+		fmt.Fprintf(w, "%s\n", t.Title("\tName\tURL"))
+		for _, c := range conns {
+			name := term.Text(c.Name)
+			current := ""
+			// if c.Name == currentName {
+			// 	name = term.Highlight("%s", c.Name)
+			// 	current = term.Highlight("%s", "*")
+			// }
+			fmt.Fprintf(w, "%s\t%s\t%s\n", current, name, t.Text("%s", c.ServiceURL))
+		}
+		w.Flush()
+	} else {
+		fmt.Printf("%s\n", t.Title("There were no connections."))
+	}
+}
+
+// Private API
 // Read in the config to get all the named connections
 func getAllConnectionsFromConfig() (conns ConnectionList) {
 	connectionsMap := viper.GetStringMap(config.ConnectionsKey) // map[string]interface{}

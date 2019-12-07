@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/jdrivas/gafw/config"
 	"github.com/juju/ansiterm"
 )
 
@@ -41,16 +42,18 @@ import (
 // There are two basic object display functions: List and Describe.
 // Not every data object supports both. Generally, they
 // all spport List, and some also support Describe.
-/*
+
 // Listable suppots List()
 type Listable interface {
 	List()
 }
 
+/*
 // Describable supports Describe()
 type Describable interface {
 	Describe()
 }
+*/
 
 // List and Describe display their objects by calling render, but
 // first checking that an object is there. If not they send along
@@ -63,6 +66,7 @@ func List(d Listable, resp *http.Response, err error) {
 	render(renderer, resp, err)
 }
 
+/*
 // Describe provides detailed output on the object.
 func Describe(d Describable, resp *http.Response, err error) {
 	renderer := func() {}
@@ -111,6 +115,7 @@ func displpayServerStopedF(stopped bool, resp *http.Response, err error) func() 
 		fmt.Printf("%s %s\n", Title("Server"), result)
 	})
 }
+*/
 
 // private API
 func render(renderer func(), resp *http.Response, err error) {
@@ -129,8 +134,6 @@ func render(renderer func(), resp *http.Response, err error) {
 		}
 	}
 }
-
-*/
 
 // The Decorators are built as pre function call. That is print, then
 // call your argument. So this goes frist to last, with the list.

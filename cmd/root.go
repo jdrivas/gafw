@@ -42,6 +42,7 @@ func Execute() {
 var (
 	rootCmd, interactiveCmd *cobra.Command
 	httpCmd                 *cobra.Command
+	listCmd                 *cobra.Command
 )
 
 // This is pulled out specially, because for interactive
@@ -117,6 +118,13 @@ func buildRoot(mode runMode) {
 		},
 	})
 
+	listCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List objects",
+		Long:  "Short description of a collection of objects.",
+	}
+	rootCmd.AddCommand(listCmd)
+
 	httpCmd = &cobra.Command{
 		Use:   "http",
 		Short: "Use HTTP verbs.",
@@ -124,6 +132,7 @@ func buildRoot(mode runMode) {
 	}
 	rootCmd.AddCommand(httpCmd)
 	buildHTTP(mode)
+
 }
 
 //
