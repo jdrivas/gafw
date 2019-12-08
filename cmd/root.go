@@ -204,6 +204,6 @@ func initFlags() {
 	rootCmd.PersistentFlags().BoolVarP(&debug, config.DebugFlagKey, "d", false, "Describe details about what's happening.")
 	viper.BindPFlag(config.DebugFlagKey, rootCmd.PersistentFlags().Lookup(config.DebugFlagKey))
 
-	rootCmd.PersistentFlags().StringVarP(&connection.ConnectionFlagValue, config.ConnectionFlagKey, "c", "", "Use the named connection (names defined in config file)")
+	rootCmd.PersistentFlags().StringVarP(&connection.ConnectionFlagValue, connection.ConnectionFlagKey, "c", "", "Use the named connection (names defined in config file)")
 	// fmt.Printf("%s\n", t.Title("initFlags -- done"))
 }

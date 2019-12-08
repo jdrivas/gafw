@@ -39,18 +39,6 @@ const (
 	DebugFlagKey   = "debug"
 )
 
-//
-// Connections
-const (
-	ConnectionsKey             = "connections"       // string
-	DefaultConnectionNameKey   = "defaultConnection" // string
-	DefaultConnectionNameValue = "default"           // value is a string
-	ConnectionFlagKey          = "connection"        //string
-	ServiceURLKey              = "serviceURL"        // string
-	AuthTokenKey               = "authToken"         //string
-	HeadersKey                 = "headers"           // map[string]string
-)
-
 // InitConfig reads in config file and ENV variables if set.
 func InitConfig() {
 

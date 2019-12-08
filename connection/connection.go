@@ -16,6 +16,59 @@ import (
 // Public API
 //
 
+//
+//  Viper config file constants
+//
+
+// This is intended to support multiple configurations
+// read in through a viper config file.
+// Sttructured as (e.g. using yaml)
+
+// defaultConnection: connection-name-1
+// connections:
+//       default:
+//             serviceURL: http://127.0.0.1
+//						 authToken: XXX-YYY-ZZZ
+//             heaeders:
+//                   X-APP-PARAM:  some-param
+//       connection-name-1:
+//             serviceURL: http://localhost
+//						 authToken: XXX-YYY-ZZZ
+//             heaeders:
+//                   X-APP-PARAM:  some-param
+//       connection-name-2:
+//             serviceURL: http://localhost
+//						 authToken: XXX-YYY-ZZZ
+//             heaeders:
+//                   X-APP-PARAM:  some-param
+//
+// DefaultConnection
+//  If the config paramater defaultConnection is set, then this name is used as a default,
+// if there is connection with that name deflined.
+// If defaultConnection is not set, or not found, then the connection named DefaultConnectionNameKey
+//  is used.
+// If that is not defined, then the list of connetions is sorted lexographically and the first
+// connection is used (I would rather have it be the first one in the connection list, but viper
+// manages nested configurations as maps and they are randomly ordered).
+// If not connections are defined then there is a default connection named DefaultConnectionNameValue
+// and with ServiceURL set by DefaultServiceURL.
+
+// initConnections sets up the first current Connection,
+// initializes the ShowTokens state, and should be called whenever the Viper config file gets reloaded.
+// Since we need at least a URL to break and/or let us know that no token has been set.
+
+const (
+	ConnectionsKey             = "connections"       // string
+	DefaultConnectionNameKey   = "defaultConnection" // string
+	DefaultConnectionNameValue = "default"           // value is a string
+	ConnectionFlagKey          = "connection"        //string
+	ServiceURLKey              = "serviceURL"        // string
+	AuthTokenKey               = "authToken"         //string
+	HeadersKey                 = "headers"           // map[string]string
+)
+
+const DefaultServiceURL = "http://127.0.0.1:80"
+
 // Connection contains information for connecting to a service endpoint.
 type Connection struct {
 	Name       string
@@ -24,7 +77,7 @@ type Connection struct {
 	Headers    map[string]string
 }
 
-// ConnectionList is a colleciton of connections.
+// ConnectionsList is a colleciton of connections.
 type ConnectionList []*Connection
 
 // Sort by name
@@ -121,7 +174,7 @@ func (conns ConnectionList) List() {
 // Private API
 // Read in the config to get all the named connections
 func getAllConnectionsFromConfig() (conns ConnectionList) {
-	connectionsMap := viper.GetStringMap(config.ConnectionsKey) // map[string]interface{}
+	connectionsMap := viper.GetStringMap(ConnectionsKey) // map[string]interface{}
 	for name := range connectionsMap {
 		conn, ok := getConnectionFromConfig(name)
 		if ok {
@@ -134,23 +187,18 @@ func getAllConnectionsFromConfig() (conns ConnectionList) {
 }
 
 func getConnectionFromConfig(name string) (conn *Connection, ok bool) {
-	connKey := fmt.Sprintf("%s.%s", config.ConnectionsKey, name)
+	connKey := fmt.Sprintf("%s.%s", ConnectionsKey, name)
 	if viper.IsSet(connKey) {
 		conn = &Connection{
 			Name:       name,
-			ServiceURL: viper.GetString(fmt.Sprintf("%s.%s", connKey, config.ServiceURLKey)),
-			AuthToken:  viper.GetString(fmt.Sprintf("%s.%s", connKey, config.AuthTokenKey)),
-			Headers:    viper.GetStringMapString(fmt.Sprintf("%s.%s", connKey, config.HeadersKey)),
+			ServiceURL: viper.GetString(fmt.Sprintf("%s.%s", connKey, ServiceURLKey)),
+			AuthToken:  viper.GetString(fmt.Sprintf("%s.%s", connKey, AuthTokenKey)),
+			Headers:    viper.GetStringMapString(fmt.Sprintf("%s.%s", connKey, HeadersKey)),
 		}
 		ok = true
 	}
 	return conn, ok
 }
-
-// initConnections sets up the first current Connection,
-// initializes the ShowTokens state, and should be called whenever the Viper config file gets reloaded.
-// Since we need at least a URL to break and/or let us know that no token has been set.
-const defaultServiceURL = "http://127.0.0.1:80"
 
 // ConnectionFlagValue his is where command line  flag will store a conenction value to use.
 var ConnectionFlagValue string
@@ -186,10 +234,10 @@ func InitConnections() {
 				fmt.Printf("No current Connection.\n")
 			}
 			// If there is a connection named default, use it ....
-			conn, ok = GetConnection(config.DefaultConnectionNameValue)
+			conn, ok = GetConnection(DefaultConnectionNameValue)
 			if !ok {
 				// .. Otherwise, see if there is a _name_ of a defined connection to use as default ...
-				defaultName := viper.GetString(config.DefaultConnectionNameKey)
+				defaultName := viper.GetString(DefaultConnectionNameKey)
 				conn, ok = GetConnection(defaultName)
 				if !ok {
 
@@ -208,8 +256,8 @@ func InitConnections() {
 							fmt.Printf("Using a 'broken' default connection.\n")
 						}
 						conn = &Connection{
-							Name:       config.DefaultConnectionNameValue,
-							ServiceURL: defaultServiceURL,
+							Name:       DefaultConnectionNameValue,
+							ServiceURL: DefaultServiceURL,
 						}
 					}
 				}
