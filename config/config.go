@@ -45,6 +45,7 @@ const (
 	ConnectionsKey             = "connections"       // string
 	DefaultConnectionNameKey   = "defaultConnection" // string
 	DefaultConnectionNameValue = "default"           // value is a string
+	ConnectionFlagKey          = "connection"        //string
 	ServiceURLKey              = "serviceURL"        // string
 	AuthTokenKey               = "authToken"         //string
 	HeadersKey                 = "headers"           // map[string]string

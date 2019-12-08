@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/jdrivas/gafw/config"
-	"github.com/spf13/viper"
 )
 
 // Test to make sure that when InitConnections is called
@@ -19,12 +18,31 @@ func Test_InitialStack(t *testing.T) {
 		fmt.Printf("Stack: %#+v\n", currentConnections)
 	}
 
-	resetConnection()
+	resetConnections()
 }
 
-// the rest of the tests will mock out viper and
-// assum an empty stack.
-func resetConnection() {
-	viper.Reset()
-	currentConnections = make([]*Connection, 0)
+func Test_FlagConig(t *testing.T) {
+	config.SetDebug(true)
+	setName := "Test-1"
+	setConnectionConfig(config.DefaultConnectionNameValue, "http://localhost")
+	setConnectionConfig(setName, "http:127.0.0.1")
+	ConnectionFlagValue = setName
+
+	// Initalize the connections
+	InitConnections()
+	cn := GetCurrentConnection().Name
+	if setName != cn {
+		t.Errorf("Checking names, got: %s, expected %s", cn, setName)
+	}
+
+	ConnectionFlagValue = "" // rest as in cobra.Reset()
+	ResetConnection()
+	InitConnections()
+
+	cn = GetCurrentConnection().Name
+	if cn != config.DefaultConnectionNameValue {
+		t.Errorf("Checking names, got: %s, expected %s", cn, config.DefaultConnectionNameValue)
+	}
+
+	resetConnections()
 }

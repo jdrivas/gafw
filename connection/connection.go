@@ -152,55 +152,90 @@ func getConnectionFromConfig(name string) (conn *Connection, ok bool) {
 // Since we need at least a URL to break and/or let us know that no token has been set.
 const defaultServiceURL = "http://127.0.0.1:80"
 
+// ConnectionFlagValue his is where command line  flag will store a conenction value to use.
+var ConnectionFlagValue string
+var previouslySetByFlag bool
+
 // InitConnections initializes a default connection. Needs to happen after we've read in the viper configuration file.
 // TODO: It's probably best if init is idempotent.
 func InitConnections() {
 	if config.Debug() {
 		fmt.Printf("Initializing Connections\n")
 	}
-	fmt.Printf("Initializing Connections\n")
 
-	// Current conenction should be durable during interactive mode
-	// reset it to the default ...
+	// Flag will overide all so:
+	var ok bool
 	var conn *Connection
-	if len(currentConnections) == 0 {
+	if ConnectionFlagValue != "" {
 		if config.Debug() {
-			fmt.Printf("No current Connection.\n")
+			fmt.Printf("Using flag value.\n")
 		}
-		// If there is a connection named default, use it ....
-		var ok bool
-		conn, ok = GetConnection(config.DefaultConnectionNameValue)
+		conn, ok = GetConnection(ConnectionFlagValue)
 		if !ok {
-			// .. Otherwise, see if there is a _name_ of a defined connection to use as default ...
-			defaultName := viper.GetString(config.DefaultConnectionNameKey)
-			conn, ok = GetConnection(defaultName)
+			fmt.Printf("Couldn't find the connection: \"%s\"\n", ConnectionFlagValue)
+			// Yes, now we will have no connection set if there wsas not one already set.
+		} else {
+			previouslySetByFlag = true
+		}
+	} else {
+		fmt.Printf("Not using connection flag value.\n")
+		// Current conenction should be durable during interactive mode
+		// reset it to the default ...
+		if len(currentConnections) == 0 {
+			if config.Debug() {
+				fmt.Printf("No current Connection.\n")
+			}
+			// If there is a connection named default, use it ....
+			conn, ok = GetConnection(config.DefaultConnectionNameValue)
 			if !ok {
+				// .. Otherwise, see if there is a _name_ of a defined connection to use as default ...
+				defaultName := viper.GetString(config.DefaultConnectionNameKey)
+				conn, ok = GetConnection(defaultName)
+				if !ok {
 
-				// ... next look for _any_ defined connections.
-				// Rather than pick a random connection (maps don't have a determined order.
-				// and we get connections from the config file as a map), pick the first lexographic one.
-				conns := getAllConnectionsFromConfig()
-				if len(conns) > 0 {
-					sort.Sort(byName(conns))
-					conn = conns[0]
-				} else {
-					// ... As a last resort set up a broken empty connection.
-					// We won't panic here as we can set it during interactive
-					// mode and it will otherwise error.
-					if config.Debug() {
-						fmt.Printf("Using a 'broken' default connection.\n")
-					}
-					conn = &Connection{
-						Name:       config.DefaultConnectionNameValue,
-						ServiceURL: defaultServiceURL,
+					// ... next look for _any_ defined connections.
+					// Rather than pick a random connection (maps don't have a determined order.
+					// and we get connections from the config file as a map), pick the first lexographic one.
+					conns := getAllConnectionsFromConfig()
+					if len(conns) > 0 {
+						sort.Sort(byName(conns))
+						conn = conns[0]
+					} else {
+						// ... As a last resort set up a broken empty connection.
+						// We won't panic here as we can set it during interactive
+						// mode and it will otherwise error.
+						if config.Debug() {
+							fmt.Printf("Using a 'broken' default connection.\n")
+						}
+						conn = &Connection{
+							Name:       config.DefaultConnectionNameValue,
+							ServiceURL: defaultServiceURL,
+						}
 					}
 				}
 			}
+		} else { // use the current connection whatever it is.
+			conn = GetCurrentConnection()
 		}
-		if config.Debug() {
-			fmt.Printf("Using connection: %s[%s]\n", conn.Name, conn.ServiceURL)
-		}
-
-		PushCurrentConnection(conn)
 	}
+	if config.Debug() {
+		fmt.Printf("Using connection: %s[%s]\n", conn.Name, conn.ServiceURL)
+	}
+	PushCurrentConnection(conn)
+}
+
+// ResetConnection is called to unset the conneciton set by a flag.
+// Most usefull in an interactive mode where you want the flag
+// to be a one time effect.
+func ResetConnection() {
+	// If the last time through, we were set by a flag
+	// get the old connetion back and decide what to do.
+	if previouslySetByFlag {
+		if config.Debug() {
+			fmt.Printf("Reseting connection to pre-flag.\n")
+		}
+		PopCurrentConnection()
+		previouslySetByFlag = false
+	}
+
 }

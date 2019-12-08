@@ -7,6 +7,11 @@ func Debug() bool {
 	return viper.GetBool(DebugFlagKey)
 }
 
+// SetDebug allows you to turn on or off the debug mode.
+func SetDebug(b bool) {
+	viper.Set(DebugFlagKey, b)
+}
+
 // ToggleDebug toggles the flag and returns the new value.
 func ToggleDebug() bool {
 	viper.Set(DebugFlagKey, viper.GetBool(DebugFlagKey))

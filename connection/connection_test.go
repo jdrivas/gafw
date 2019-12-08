@@ -59,6 +59,12 @@ func Test_Stack_Bounds(t *testing.T) {
 	}
 
 }
+
+// This sets up viper with Connection configuration.
+func setConnectionConfig(name, url string) {
+	viper.Set(fmt.Sprintf("%s.%s.%s", config.ConnectionsKey, name, config.ServiceURLKey), url)
+}
+
 func Test_Stack_Growth(t *testing.T) {
 	viper.Reset()
 
@@ -99,8 +105,4 @@ func Test_Stack_Growth(t *testing.T) {
 	}
 
 	viper.Reset()
-}
-
-func setConnectionConfig(name, url string) {
-	viper.Set(fmt.Sprintf("%s.%s.%s", config.ConnectionsKey, name, config.ServiceURLKey), url)
 }

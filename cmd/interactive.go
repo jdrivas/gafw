@@ -82,6 +82,7 @@ func resetEnvironment() {
 	rootCmd.AddCommand(exitCmd)
 	rootCmd.AddCommand(verboseCmd)
 	rootCmd.AddCommand(debugCmd)
+	connection.ResetConnection()
 
 	// initialize the flags on the tree
 	// initFlags()
