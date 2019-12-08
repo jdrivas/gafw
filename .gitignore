@@ -2,3 +2,4 @@ gafw*
 .*_history
 *.yaml
 *conflicted copy*
+.vscode
