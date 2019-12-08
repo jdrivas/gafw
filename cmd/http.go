@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jdrivas/gafw/config"
-	"github.com/jdrivas/gafw/connection"
-	"github.com/jdrivas/gafw/term"
+	config "github.com/jdrivas/vconfig"
+	connection "github.com/jdrivas/conman"
+	term "github.com/jdrivas/termtext"
 	"github.com/spf13/cobra"
 )
 

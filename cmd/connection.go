@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/jdrivas/gafw/connection"
-	"github.com/jdrivas/gafw/term"
+	connection "github.com/jdrivas/conman"
+	t "github.com/jdrivas/termtext"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ func buildConnection(runMode) {
 		Args:    cobra.MaximumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			conns := connection.GetAllConnections()
-			term.List(conns, nil, nil)
+			t.List(conns, nil, nil)
 		},
 	})
 
@@ -31,7 +31,7 @@ func buildConnection(runMode) {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := connection.SetConnection(args[0])
 			if err != nil {
-				term.List(connection.GetAllConnections(), nil, err)
+				t.List(connection.GetAllConnections(), nil, err)
 			}
 		},
 	})

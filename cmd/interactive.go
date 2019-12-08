@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
-	"github.com/jdrivas/gafw/config"
-	"github.com/jdrivas/gafw/connection"
-	t "github.com/jdrivas/gafw/term"
+	config "github.com/jdrivas/vconfig"
+	connection "github.com/jdrivas/conman"
+	t "github.com/jdrivas/termtext"
 
 	// "github.com/fatih/color"
 	"github.com/spf13/cobra"

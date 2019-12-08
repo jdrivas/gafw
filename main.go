@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/jdrivas/gafw/cmd"
-	"github.com/jdrivas/gafw/term"
+	t "github.com/jdrivas/termtext"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	// 	fmt.Printf("%s: %v\n", k, v)
 	// }
 
-	term.InitTerm()
+	t.InitTerm()
 
 	// Off you go ....
 	cmd.Execute()

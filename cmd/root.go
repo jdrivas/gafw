@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jdrivas/gafw/config"
-	"github.com/jdrivas/gafw/connection"
-	"github.com/jdrivas/gafw/term"
-	t "github.com/jdrivas/gafw/term"
+	connection "github.com/jdrivas/conman"
 	"github.com/jdrivas/gafw/version"
+	t "github.com/jdrivas/termtext"
+	config "github.com/jdrivas/vconfig"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -152,8 +151,9 @@ func buildRoot(mode runMode) {
 // InitCmd is designed to be used from Main - ordering is important here so can't just execute whenever.
 // Should only be called once.
 func init() {
-	// fmt.Printf("%s\n", t.Title("InitCmd"))  // We can't bracket this with config.Debug as viper won't be set yet.
+	// fmt.Printf("%s\n", t.Title("cmd/root/init()")) // We can't bracket this with config.Debug as viper won't be set yet.
 
+	config.AppName = "gafw"
 	cobra.OnInitialize(doCobraOnInit)
 
 	rootCmd = &cobra.Command{
@@ -176,7 +176,7 @@ func doCobraOnInit() {
 		fmt.Printf("%s\n", t.Title("doCobraOnInit()"))
 	}
 	config.InitConfig()
-	term.InitTerm()
+	t.InitTerm()
 	connection.InitConnections()
 
 	if config.Debug() {
