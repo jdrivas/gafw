@@ -178,7 +178,7 @@ func InitConnections() {
 			previouslySetByFlag = true
 		}
 	} else {
-		fmt.Printf("Not using connection flag value.\n")
+
 		// Current conenction should be durable during interactive mode
 		// reset it to the default ...
 		if len(currentConnections) == 0 {
@@ -234,8 +234,15 @@ func ResetConnection() {
 		if config.Debug() {
 			fmt.Printf("Reseting connection to pre-flag.\n")
 		}
-		PopCurrentConnection()
+
+		// Don't reset to an empty connection.
+		// This can happen if we provide a connection
+		// by flag on the command line but the command line
+		// sends us into interactive mode.
 		previouslySetByFlag = false
+		if len(currentConnections) > 1 {
+			PopCurrentConnection()
+		}
 	}
 
 }
