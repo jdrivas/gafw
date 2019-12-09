@@ -7,11 +7,9 @@ import (
 	"strings"
 
 	"github.com/chzyer/readline"
-	config "github.com/jdrivas/vconfig"
 	connection "github.com/jdrivas/conman"
 	t "github.com/jdrivas/termtext"
-
-	// "github.com/fatih/color"
+	config "github.com/jdrivas/vconfig"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
