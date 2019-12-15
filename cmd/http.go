@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	config "github.com/jdrivas/vconfig"
 	connection "github.com/jdrivas/conman"
-	term "github.com/jdrivas/termtext"
+	config "github.com/jdrivas/vconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -28,9 +27,9 @@ with the ContentType header set to application/json.`,
 		Args:    cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 2 {
-				term.HTTPDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], nil, nil))
+				httpDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], nil, nil))
 			} else {
-				term.HTTPDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], strings.Join(args[2:], " "), nil))
+				httpDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], strings.Join(args[2:], " "), nil))
 			}
 		},
 	})
@@ -44,7 +43,7 @@ with the ContentType header set to application/json.`,
 		Long:                  " Sends an HTTP GET <command> to the service endpoint.",
 		Example:               fmt.Sprintf("%s http get /users", config.AppName),
 		Run: func(cmd *cobra.Command, args []string) {
-			term.HTTPDisplay(connection.GetCurrentConnection().Get(args[0], nil))
+			httpDisplay(connection.GetCurrentConnection().Get(args[0], nil))
 		},
 	})
 
@@ -62,9 +61,9 @@ with the ContentType header set to application/json.`,
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) > 1 {
-				term.HTTPDisplay(connection.GetCurrentConnection().Post(args[0], strings.Join(args[1:], " "), nil))
+				httpDisplay(connection.GetCurrentConnection().Post(args[0], strings.Join(args[1:], " "), nil))
 			} else {
-				term.HTTPDisplay(connection.GetCurrentConnection().Post(args[0], nil, nil))
+				httpDisplay(connection.GetCurrentConnection().Post(args[0], nil, nil))
 			}
 		},
 	})
@@ -81,7 +80,7 @@ with the ContentType header set to application/json.`,
 		Example: fmt.Sprintf("%s http delete /groups/test/users {\"name\": \"admin\", \"users\": [\"david\"]}", config.AppName),
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			term.HTTPDisplay(connection.GetCurrentConnection().Delete(args[0], nil, nil))
+			httpDisplay(connection.GetCurrentConnection().Delete(args[0], nil, nil))
 		},
 	})
 

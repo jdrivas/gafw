@@ -185,8 +185,10 @@ func doCobraOnInit() {
 }
 
 var (
-	debug, verbose bool
+	debug, verbose, json bool
 )
+
+const jsonFlagKey = "json"
 
 // This is pulled out of the general init because
 // we want to refer to it in interactive mode, where we first rootCmd.ResetFlags() to start
@@ -205,5 +207,9 @@ func initFlags() {
 	viper.BindPFlag(config.DebugFlagKey, rootCmd.PersistentFlags().Lookup(config.DebugFlagKey))
 
 	rootCmd.PersistentFlags().StringVarP(&connection.ConnectionFlagValue, connection.ConnectionFlagKey, "c", "", "Use the named connection (names defined in config file)")
+
+	rootCmd.PersistentFlags().BoolVarP(&json, jsonFlagKey, "j", false, "Print output in unencumbred JSON for easy scripting.")
+	viper.BindPFlag(t.JSONDisplayKey, rootCmd.PersistentFlags().Lookup(jsonFlagKey))
+
 	// fmt.Printf("%s\n", t.Title("initFlags -- done"))
 }
