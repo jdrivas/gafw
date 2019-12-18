@@ -186,9 +186,13 @@ func doCobraOnInit() {
 
 var (
 	debug, verbose, json bool
+	screenProfileName    string
 )
 
-const jsonFlagKey = "json"
+const (
+	jsonFlagKey          = "json"
+	screenProfileFlagKey = "screen"
+)
 
 // This is pulled out of the general init because
 // we want to refer to it in interactive mode, where we first rootCmd.ResetFlags() to start
@@ -210,6 +214,11 @@ func initFlags() {
 
 	rootCmd.PersistentFlags().BoolVarP(&json, jsonFlagKey, "j", false, "Print output in unencumbred JSON for easy scripting.")
 	viper.BindPFlag(t.JSONDisplayKey, rootCmd.PersistentFlags().Lookup(jsonFlagKey))
+
+	// ScreenProfile
+	rootCmd.PersistentFlags().StringVarP(&screenProfileName, screenProfileFlagKey, "s", t.ScreenNoColorDefaultKey,
+		"Set the screen profile for output (e.g. colors etc).")
+	viper.BindPFlag(t.ScreenProfileKey, rootCmd.PersistentFlags().Lookup(screenProfileFlagKey))
 
 	// fmt.Printf("%s\n", t.Title("initFlags -- done"))
 }
