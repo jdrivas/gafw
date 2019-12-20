@@ -41,7 +41,8 @@ func Execute() {
 var (
 	rootCmd, interactiveCmd *cobra.Command
 	httpCmd                 *cobra.Command
-	listCmd, setCmd         *cobra.Command
+	listCmd, describeCmd    *cobra.Command
+	setCmd                  *cobra.Command
 )
 
 // This is pulled out specially, because for interactive
@@ -123,6 +124,13 @@ func buildRoot(mode runMode) {
 		Long:  "Short description of a collection of objects.",
 	}
 	rootCmd.AddCommand(listCmd)
+
+	describeCmd = &cobra.Command{
+		Use:   "describe",
+		Short: "Details about an object",
+		Long:  "Detailed description of a an object.",
+	}
+	rootCmd.AddCommand(describeCmd)
 
 	setCmd = &cobra.Command{
 		Use:   "set",

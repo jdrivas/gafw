@@ -55,6 +55,8 @@ github.com/jdrivas/conman v0.1.2 h1:ge2gGkELZqpQQgkI/SevrbnyTeU/lNYXKBwczZm4EK8=
 github.com/jdrivas/conman v0.1.2/go.mod h1:daKCxf01YU/EeoEuPhCpN2TOUED/Ayz8vTH1QREqnk4=
 github.com/jdrivas/conman v0.1.4 h1:AQ0fwVx4KttMLcoVGZPAky/XeD7bdpo808ALG0Hv7iU=
 github.com/jdrivas/conman v0.1.4/go.mod h1:daKCxf01YU/EeoEuPhCpN2TOUED/Ayz8vTH1QREqnk4=
+github.com/jdrivas/conman v0.1.5 h1:JCpDEPt9VEN4OG6jUeiC4wufPylvmZV1V0sKHjOfLA0=
+github.com/jdrivas/conman v0.1.5/go.mod h1:v0nG3B9zhUmzl6ss2mg21Nvin5+UE9PwAHTJTsGZyKE=
 github.com/jdrivas/termtext v0.0.0-20191208212551-19c763e9c5bc h1:JzdW4U+xeTEUQUb1RgIFVAcd3pdYMw/mBYJZKVcTaQc=
 github.com/jdrivas/termtext v0.0.0-20191208212551-19c763e9c5bc/go.mod h1:VAJNGiEujKfnT6CLwuuLRD/HhoAehGmePowu6Mq3DJI=
 github.com/jdrivas/termtext v0.2.2 h1:Wb31aV+9oxm3gPKNTOxDVEtubHO6xWQNL6ShmcuNNJk=
@@ -63,6 +65,8 @@ github.com/jdrivas/termtext v0.2.3 h1:hAAD1Aly9Tcto1+qJw5eUCCRusChSTafbnKGd0/w32
 github.com/jdrivas/termtext v0.2.3/go.mod h1:FKnyYqp6BmmAgMYLSftqGlvgEdw/fZL3ct9N/SEjE/o=
 github.com/jdrivas/termtext v0.2.6 h1:klAAz6ssUDNei0nnwuHcJ2IJ9dkU4xfQ27UOucDlMi4=
 github.com/jdrivas/termtext v0.2.6/go.mod h1:FKnyYqp6BmmAgMYLSftqGlvgEdw/fZL3ct9N/SEjE/o=
+github.com/jdrivas/termtext v0.2.7 h1:aG0jTho3dBHJIG/P9V/P7yrmX7cpsJpx+tYcRA2Ji4k=
+github.com/jdrivas/termtext v0.2.7/go.mod h1:FKnyYqp6BmmAgMYLSftqGlvgEdw/fZL3ct9N/SEjE/o=
 github.com/jdrivas/vconfig v0.0.0-20191208212235-11e9161c616b h1:TowA2KZO40L4g+RdHnXlxgha6+D33mbh/YWSkP9NqtQ=
 github.com/jdrivas/vconfig v0.0.0-20191208212235-11e9161c616b/go.mod h1:2IoirZoQt1eYgVlqTRUTOV3N+6nFYFM8PRNvBjhBnGo=
 github.com/jdrivas/vconfig v0.2.0 h1:Xs/p5a/K5poD+i7+NstDBvv53y8qD4hMK9ed5G+kZTE=
@@ -185,6 +189,8 @@ golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 h1:gSbV7h1NRL2G1xTg/owz62CST
 golang.org/x/sys v0.0.0-20191210023423-ac6580df4449/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191218084908-4a24b4065292 h1:Y8q0zsdcgAd+JU8VUA8p8Qv2YhuY9zevDG2ORt5qBUI=
 golang.org/x/sys v0.0.0-20191218084908-4a24b4065292/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191219235734-af0d71d358ab h1:j8r8g0V3tVdbo274kyTmC+yEsChru2GfvdiV84wm5T8=
+golang.org/x/sys v0.0.0-20191219235734-af0d71d358ab/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
