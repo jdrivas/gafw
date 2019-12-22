@@ -17,7 +17,7 @@ import (
 var (
 
 	// Type exit instead of just control-d, Note: We actually os.exit() here.
-	// Which eans no post-processing of any kind including simply falling through
+	// Which means no post-processing of any kind if there was any by simply falling through
 	// to the orignial Execute command.
 	// if this is a problem, move the definition of the promptLoop moreCommands up
 	// to module scope and set it to false in the Run function directly below.
@@ -74,21 +74,15 @@ func resetEnvironment() {
 	// each time through.
 	// Remember
 	rootCmd.ResetFlags()
-	rootCmd.ResetCommands()
-	buildRoot(interactive)
+	// rootCmd.ResetCommands()
+	// buildRoot(interactive)
 	initFlags()
+	// resetFlagState()
 	rootCmd.AddCommand(exitCmd)
 	rootCmd.AddCommand(verboseCmd)
 	rootCmd.AddCommand(debugCmd)
 	connection.ResetConnection()
 
-	// initialize the flags on the tree
-	// initFlags()
-	// config.InitConfig()
-	// This is only here to reset the prmopt
-	// TODO: The connection handling logicis is
-	// a disaster. Fix it.
-	// initConnectionWithFlags()
 	if config.Debug() {
 		fmt.Printf("%s\n", t.Title("interactive.resetEnvironment() - exit"))
 	}
