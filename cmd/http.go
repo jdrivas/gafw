@@ -26,10 +26,12 @@ with the ContentType header set to application/json.`,
 		Example: fmt.Sprintf(" %s http send post /groups/test/users {\"name\": \"admin\", \"users\": [\"david\"]}", config.AppName),
 		Args:    cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 2 {
-				httpDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], nil, nil))
-			} else {
-				httpDisplay(connection.GetCurrentConnection().Send(strings.ToUpper(args[0]), args[1], strings.Join(args[2:], " "), nil))
+			if conn, err := connection.GetCurrentConnection(); err == nil {
+				if len(args) == 2 {
+					httpDisplay(conn.Send(strings.ToUpper(args[0]), args[1], nil, nil))
+				} else {
+					httpDisplay(conn.Send(strings.ToUpper(args[0]), args[1], strings.Join(args[2:], " "), nil))
+				}
 			}
 		},
 	})
@@ -43,7 +45,9 @@ with the ContentType header set to application/json.`,
 		Long:                  " Sends an HTTP GET <command> to the service endpoint.",
 		Example:               fmt.Sprintf("%s http get /users", config.AppName),
 		Run: func(cmd *cobra.Command, args []string) {
-			httpDisplay(connection.GetCurrentConnection().Get(args[0], nil))
+			if conn, err := connection.GetCurrentConnection(); err == nil {
+				httpDisplay(conn.Get(args[0], nil))
+			}
 		},
 	})
 
@@ -60,10 +64,12 @@ with the ContentType header set to application/json.`,
 		Example: fmt.Sprintf("%s http post /groups/test/users {\"name\": \"admin\", \"users\": [\"david\"]}", config.AppName),
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) > 1 {
-				httpDisplay(connection.GetCurrentConnection().Post(args[0], strings.Join(args[1:], " "), nil))
-			} else {
-				httpDisplay(connection.GetCurrentConnection().Post(args[0], nil, nil))
+			if conn, err := connection.GetCurrentConnection(); err == nil {
+				if len(args) > 1 {
+					httpDisplay(conn.Post(args[0], strings.Join(args[1:], " "), nil))
+				} else {
+					httpDisplay(conn.Post(args[0], nil, nil))
+				}
 			}
 		},
 	})
@@ -80,7 +86,9 @@ with the ContentType header set to application/json.`,
 		Example: fmt.Sprintf("%s http delete /groups/test/users {\"name\": \"admin\", \"users\": [\"david\"]}", config.AppName),
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			httpDisplay(connection.GetCurrentConnection().Delete(args[0], nil, nil))
+			if conn, err := connection.GetCurrentConnection(); err == nil {
+				httpDisplay(conn.Delete(args[0], nil, nil))
+			}
 		},
 	})
 

@@ -4,7 +4,6 @@ package main
 
 import (
 	"github.com/jdrivas/gafw/cmd"
-	t "github.com/jdrivas/termtext"
 )
 
 func main() {
@@ -15,8 +14,6 @@ func main() {
 	// for k, v := range viper.AllSettings() {
 	// 	fmt.Printf("%s: %v\n", k, v)
 	// }
-
-	t.InitTerm()
 
 	// Off you go ....
 	cmd.Execute()

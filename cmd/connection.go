@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	connection "github.com/jdrivas/conman"
 	t "github.com/jdrivas/termtext"
 	"github.com/spf13/cobra"
@@ -47,9 +49,9 @@ func buildConnection(runMode) {
 		Long:    "Sets the service connection to the named connection.",
 		Args:    cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := connection.SetConnection(args[0])
-			if err != nil {
-				t.List(connection.GetAllConnections(), nil, err)
+			if ok := connection.SetConnection(args[0]); !ok {
+				fmt.Printf(t.Fail("couldn't find a connection for %s\n", args[0]))
+				t.List(connection.GetAllConnections(), nil, nil)
 			}
 		},
 	})

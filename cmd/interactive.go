@@ -11,7 +11,6 @@ import (
 	t "github.com/jdrivas/termtext"
 	config "github.com/jdrivas/vconfig"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -38,9 +37,10 @@ var (
 		Short:   "Toggle verbose mode and print status.",
 		Long:    "Toggle verbose, verbose will print out detailed status as its happening.",
 		Run: func(cmd *cobra.Command, args []string) {
-			viper.Set(config.VerboseKey, !viper.GetBool(config.VerboseKey))
+			config.ToggleVerbose()
+			// boundFlags.remove(config.VerboseFlagKey)
 			vs := "Off"
-			if viper.GetBool(config.VerboseKey) {
+			if config.Verbose() {
 				vs = "On"
 			}
 			fmt.Printf("Verbose is %s\n", vs)
@@ -51,11 +51,14 @@ var (
 		Use:     "debug",
 		Aliases: []string{"d"},
 		Short:   "Toggle debug mode and print status.",
-		Long:    "Toggle debug, verbose will print out detailed status as its happening.",
+		Long:    "Toggle debug, debug will print out detailed status as its happening.",
 		Run: func(cmd *cobra.Command, args []string) {
-			viper.Set(config.DebugKey, !viper.GetBool(config.DebugKey))
+			// fmt.Printf("set flags: %p, \n", &boundFlags)
+			config.ToggleDebug()
+			// boundFlags.remove(config.DebugFlagKey) // do this to remove the effect of application flags once a set has been done.
+			// fmt.Printf("boundFlags: %p\n", &boundFlags)
 			vs := "Off"
-			if viper.GetBool(config.DebugKey) {
+			if config.Verbose() {
 				vs = "On"
 			}
 			fmt.Printf("Debug is %s\n", vs)
@@ -63,51 +66,54 @@ var (
 	}
 )
 
-// Each time through the loop we rebuild the command tree
-//  and reinitialize the flags.
-func resetEnvironment() {
-	if config.Debug() {
-		fmt.Printf("%s\n", t.Title("interactive.resetEnvironment()"))
-	}
-
-	// We must rebuild the flags and the command
-	// each time through.
-	// Remember
-	rootCmd.ResetFlags()
-	// rootCmd.ResetCommands()
-	// buildRoot(interactive)
-	initFlags()
-	// resetFlagState()
+// Add the above into the tree off of rootCmd
+func addInteractiveCommands() {
 	rootCmd.AddCommand(exitCmd)
 	rootCmd.AddCommand(verboseCmd)
 	rootCmd.AddCommand(debugCmd)
-	connection.ResetConnection()
-
-	if config.Debug() {
-		fmt.Printf("%s\n", t.Title("interactive.resetEnvironment() - exit"))
-	}
-
 }
 
-// Parse the line and execute the command
+// DoInteractive sets up a readline loop that reads and executes comands.
+// This is the entrypoint for application command line interactive command.
+func DoInteractive() {
+
+	addInteractiveCommands()
+
+	readline.SetHistoryPath(fmt.Sprintf("./%s", config.HistoryFile))
+
+	xICommand := func(line string) (err error) { return doICommand(line) }
+	err := promptLoop(xICommand)
+	if err != nil {
+		fmt.Printf("Error exiting prompter: %s\n", t.Fail(err.Error()))
+	}
+}
+
+// Feed the line to Cobra at the root command.
+// Then execute rootCmd.
 func doICommand(line string) (err error) {
 
-	rootCmd.SetArgs(strings.Fields(line)) // Don't use strings.Split - it won't eat white space.
+	// rootCmd.ResetCommands()
+	// buildRoot(interactive)
+	// addInteractiveCommands()
+
+	args := strings.Fields(line) // Don't use strings.Split - it won't eat white space.
+	rootCmd.ParseFlags(args)
+	rootCmd.SetArgs(args)
 	err = rootCmd.Execute()
 
-	resetEnvironment()
 	return err
 }
 
+// Build prompt, readline, manage history, until it's time to stop.
 func promptLoop(process func(string) error) (err error) {
 
-	// Set up for the first itme through.
-	resetEnvironment()
-
 	for moreCommands := true; moreCommands; {
-		conn := connection.GetCurrentConnection()
-		serviceURL := conn.ServiceURL
-		connName := conn.Name
+		serviceURL := ""
+		connName := ""
+		if conn, err := connection.GetCurrentConnection(); err == nil {
+			serviceURL = conn.ServiceURL
+			connName = conn.Name
+		}
 		// token := conn.getSafeToken(true, false)
 		token := ""
 		spacer := ""
@@ -115,9 +121,13 @@ func promptLoop(process func(string) error) (err error) {
 			spacer = " "
 		}
 		status := statusDisplay()
-		prompt := fmt.Sprintf("%s [%s%s %s]: ", t.Title(config.AppName), t.Info(status), t.Highlight(connName), t.SubTitle("%s%s%s", serviceURL, spacer, token))
-		// prompt := fmt.Sprintf("%s [%s%s]: ", t.Title(config.AppName), t.Info(status), t.SubTitle("context"))
+		prompt := fmt.Sprintf("%s [%s%s %s]: ",
+			t.Title(config.AppName), t.Info(status), t.Highlight(connName),
+			t.SubTitle("%s%s%s", serviceURL, spacer, token))
 
+		if config.Debug() {
+			fmt.Println() // add a stanza mark between the spew.
+		}
 		line, err := readline.Line(prompt)
 		if err == io.EOF {
 			moreCommands = false
@@ -147,14 +157,4 @@ func statusDisplay() (s string) {
 		s = fmt.Sprintf("%s%s", s, " ")
 	}
 	return s
-}
-
-// DoInteractive sets up a readline loop that reads and executes comands.
-func DoInteractive() {
-	readline.SetHistoryPath(fmt.Sprintf("./%s", config.HistoryFile))
-	xICommand := func(line string) (err error) { return doICommand(line) }
-	err := promptLoop(xICommand)
-	if err != nil {
-		fmt.Printf("Error exiting prompter: %s\n", t.Fail(err.Error()))
-	}
 }
